@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 
 import ContactList from './ContactList/ContactList';
@@ -7,8 +7,18 @@ import Section from './Section/Section';
 import Filter from './Filter/Filter';
 import { ContainerGlobal } from './App.styled';
 
+const useLocalStorage = (key, initialValue) => {
+  const [state, setState] = useState(() => {
+    return JSON.parse(window.localStorage.getItem(key)) ?? initialValue;})
+
+  useEffect(() => {
+    window.localStorage.setItem(key, JSON.stringify(state))
+  }, [key, state])
+  return [state, setState]
+}
+
 export const App = () => {
-const [contacts, setContacts] = useState([]);
+const [contacts, setContacts] = useLocalStorage("contacts", []);
 const [filter, setFilter] = useState("");
 
 const submitHandler = data => {
@@ -43,6 +53,7 @@ const submitHandler = data => {
     ? contacts.filter(contact => contact.name.toLowerCase().includes(filterNormalize))
     : contacts
   };
+
 
   return (
     <ContainerGlobal>
